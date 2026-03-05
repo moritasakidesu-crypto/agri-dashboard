@@ -49,7 +49,6 @@
     }
 
     function formatDate(str) {
-      // "Thu Oct 02 2025 00:00:00 GMT+0900 (日本標準時)" → "2025/10/02"
       const months = {Jan:"01",Feb:"02",Mar:"03",Apr:"04",May:"05",Jun:"06",Jul:"07",Aug:"08",Sep:"09",Oct:"10",Nov:"11",Dec:"12"};
       const m = str.match(/([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
       if (m) {
@@ -63,7 +62,16 @@
     function buildMarketsData(rows) {
       if (!rows || rows.length < 2) return { dates: [], data: {} };
       const clean = v => (v || "").replace(/"/g, "").trim();
-      const headerRow = rows[0];
+
+      // 空行をスキップして「日付」ヘッダー行を探す
+      let headerRowIndex = -1;
+      for (let i = 0; i < rows.length; i++) {
+        const first = clean(rows[i][0]);
+        if (first === "日付") { headerRowIndex = i; break; }
+      }
+      if (headerRowIndex === -1) return { dates: [], data: {} };
+
+      const headerRow = rows[headerRowIndex];
       const dates = [];
       for (let c = 1; c < headerRow.length; c++) {
         const d = clean(headerRow[c]);
@@ -72,7 +80,7 @@
       const data = {};
       let currentMarket = null;
       const marketSuffix = "市場";
-      for (let r = 1; r < rows.length; r++) {
+      for (let r = headerRowIndex + 1; r < rows.length; r++) {
         const row = rows[r];
         const col0 = clean(row[0]);
         if (!col0) continue;
