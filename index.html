@@ -132,13 +132,78 @@
     .badge-up{background:#dcfce7;color:#15803d}
     .badge-down{background:#fee2e2;color:#dc2626}
     .badge-flat{background:#f3f4f6;color:#6b7280}
-    /* MASCOT */
-    .mascot-bubble{position:fixed;bottom:20px;right:20px;z-index:150;max-width:280px;cursor:pointer}
-    .mascot-inner{background:#fff;border:2px solid #86efac;border-radius:18px;padding:14px 16px 10px;box-shadow:0 6px 28px rgba(27,67,50,.18);position:relative}
-    .mascot-inner::after{content:"";position:absolute;bottom:-12px;right:36px;border:6px solid transparent;border-top-color:#86efac}
-    .mascot-msg{font-size:13px;color:#1b4332;line-height:1.5;font-weight:500}
-    .mascot-title{font-size:10px;font-weight:700;color:#15803d;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
-    .mascot-close{position:absolute;top:8px;right:10px;background:none;border:none;font-size:14px;cursor:pointer;color:#9ca3af}
+    /* ── MASCOT ── */
+    /* 全体ラッパー：画面右下固定、横並び（吹き出し左・キャラ右） */
+    .mascot-wrap{
+      position:fixed;bottom:0;right:0;z-index:150;
+      display:flex;flex-direction:row;align-items:flex-end;
+      padding-right:12px;
+    }
+    /* 吹き出し本体 */
+    .mascot-speech{
+      background:#fff;
+      border:2px solid #a8dfc0;
+      border-radius:20px 20px 4px 20px;  /* 右下だけ尖り気味 → キャラ方向 */
+      padding:14px 16px 13px;
+      box-shadow:0 8px 32px rgba(27,67,50,.14),0 2px 8px rgba(27,67,50,.08);
+      position:relative;
+      width:248px;
+      margin-bottom:20px;  /* キャラの足元基線に合わせる */
+      margin-right:0px;
+    }
+    /* 吹き出しのしっぽ：右下から右（キャラ方向）へ */
+    .mascot-speech::after{
+      content:"";position:absolute;
+      bottom:18px;right:-13px;
+      border:7px solid transparent;
+      border-left:13px solid #a8dfc0;
+    }
+    .mascot-speech::before{
+      content:"";position:absolute;
+      bottom:19px;right:-10px;
+      border:6px solid transparent;
+      border-left:11px solid #fff;
+      z-index:1;
+    }
+    /* キャラクター立ち絵 */
+    .mascot-char{
+      width:82px;display:block;flex-shrink:0;
+      cursor:pointer;transition:transform .25s;
+      filter:drop-shadow(0 4px 12px rgba(27,67,50,.25));
+      position:relative;z-index:1;
+    }
+    .mascot-char:hover{transform:scale(1.06) translateY(-4px)}
+    /* タブ：細くてクリーンなアンダーライン */
+    .mascot-tabs{display:flex;margin-bottom:11px;border-bottom:1.5px solid #dff0e7}
+    .mascot-tab-btn{
+      flex:1;background:none;border:none;padding:4px 2px 7px;
+      font-size:11.5px;font-weight:600;color:#b8d4c4;cursor:pointer;
+      font-family:inherit;border-bottom:2.5px solid transparent;
+      margin-bottom:-1.5px;transition:color .15s,border-color .15s;
+      letter-spacing:.3px;
+    }
+    .mascot-tab-btn.active{color:#2d6a4f;border-bottom-color:#2d6a4f}
+    .mascot-tab-btn:hover:not(.active){color:#6b9080}
+    /* テキスト */
+    .mascot-msg{font-size:12.5px;color:#1b4332;line-height:1.65;font-weight:500}
+    .mascot-guide-icon{font-size:20px;text-align:center;margin-bottom:3px}
+    .mascot-guide-title{font-size:12.5px;font-weight:700;color:#2d6a4f;text-align:center;margin-bottom:6px}
+    .mascot-close{
+      position:absolute;top:9px;right:11px;
+      background:none;border:none;font-size:12px;cursor:pointer;
+      color:#c8dfd0;transition:color .15s;line-height:1;
+      width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+      border-radius:50%;
+    }
+    .mascot-close:hover{color:#fff;background:#2d6a4f}
+    /* 閉じているときのキャラボタン */
+    .mascot-open-btn{
+      position:fixed;bottom:0;right:12px;z-index:149;
+      background:none;border:none;cursor:pointer;padding:0;
+      transition:transform .25s;
+      filter:drop-shadow(0 4px 12px rgba(27,67,50,.25));
+    }
+    .mascot-open-btn:hover{transform:scale(1.08) translateY(-5px)}
     /* SIDE PANEL */
     .layout-wrap{display:flex;gap:0;position:relative}
     .main-content{flex:1;min-width:0;transition:margin-right .3s ease}
@@ -188,6 +253,31 @@ const ITEM_COLORS = {
   "きゅうり":"#ec4899","なす":"#7c3aed","レタス":"#1e40af",
   "ピーマン":"#fb923c","大根":"#67e8f9","ブロッコリー":"#bef264",
   "トマト":"#ef4444",
+  // 漢字・カタカナ表記ゆれ対応
+  "人参":"#c2410c","ニンジン":"#c2410c","にんじん(冬)":"#c2410c","にんじん(春)":"#c2410c",
+  "キャベツ(春)":"#84cc16","キャベツ(冬)":"#84cc16","春キャベツ":"#84cc16",
+  "長ねぎ":"#f9a8d4","長ネギ":"#f9a8d4","葱":"#f9a8d4","ねぎ":"#f9a8d4",
+  "白ねぎ":"#f9a8d4","白ネギ":"#f9a8d4",
+  "ほうれんそう":"#16a34a","ホウレンソウ":"#16a34a","ほうれん草(冬)":"#16a34a",
+  "コマツナ":"#2563eb","こまつな":"#2563eb",
+  "玉葱":"#c2853a","タマネギ":"#c2853a","たまねぎ":"#c2853a",
+  "ジャガイモ":"#92400e","じゃが芋":"#92400e","馬鈴薯":"#92400e",
+  "白菜(冬)":"#facc15","ハクサイ":"#facc15","はくさい":"#facc15",
+  "薩摩芋":"#a78bfa","サツマイモ":"#a78bfa","さつま芋":"#a78bfa",
+  "キュウリ":"#ec4899","胡瓜":"#ec4899",
+  "ナス":"#7c3aed","茄子":"#7c3aed",
+  "レタス(春)":"#1e40af","サニーレタス":"#1e40af","リーフレタス":"#1e40af",
+  "ピーマン(夏)":"#fb923c","パプリカ":"#fb923c",
+  "大根(冬)":"#67e8f9","ダイコン":"#67e8f9","だいこん":"#67e8f9",
+  "ブロッコリー(冬)":"#bef264","ブロッコリ":"#bef264",
+  "トマト(夏)":"#ef4444","ミニトマト":"#ef4444",
+}
+// 品目色の正規化取得（部分一致フォールバック付き）
+function getItemColor(item) {
+  if (ITEM_COLORS[item]) return ITEM_COLORS[item];
+  // 部分一致で探す（例: "にんじん(冬)" → "にんじん" にヒット）
+  const key = Object.keys(ITEM_COLORS).find(k => item.includes(k) || k.includes(item));
+  return key ? ITEM_COLORS[key] : "#16a34a";
 };
 const AVG_COLOR = "#059669";
 const MARKET_COLORS = {
@@ -621,7 +711,7 @@ function MarketDashboard() {
       });
     } else {
       selectedItems.forEach(item => {
-        result.push({ key:item, label:item, color:ITEM_COLORS[item]||"#16a34a", dashed:false });
+        result.push({ key:item, label:item, color:getItemColor(item), dashed:false });
       });
     }
     if (showAvg) {
@@ -739,7 +829,7 @@ function MarketDashboard() {
           {favPrices.length > 0 ? favPrices.map(fp => (
             <div key={fp.item} className="fav-price-card">
               <div className="fav-card-name">
-                <span className="color-dot" style={{background:ITEM_COLORS[fp.item]||"#16a34a"}}></span>
+                <span className="color-dot" style={{background:getItemColor(fp.item)}}></span>
                 {fp.item}
               </div>
               <div className="fav-card-price">¥{fp.last?.toLocaleString()}</div>
@@ -830,7 +920,7 @@ function MarketDashboard() {
                   className={`item-pill${selectedItems.includes(item)?" active":""}${favorites.includes(item)?" fav":""}`}
                   onClick={()=>toggleItem(item)}
                   onDoubleClick={()=>toggleFav(item)}
-                  style={{background: selectedItems.includes(item) ? (ITEM_COLORS[item]||"#16a34a") : "",
+                  style={{background: selectedItems.includes(item) ? (getItemColor(item)) : "",
                           borderColor: selectedItems.includes(item) ? "transparent" : ""}}>
                   {favorites.includes(item) && <span className="fav-star">⭐</span>}
                   {item}
@@ -898,8 +988,8 @@ function MarketDashboard() {
                       )
                     : selectedItems.map(item => (
                         <Line key={item} type="monotone" dataKey={item}
-                          stroke={ITEM_COLORS[item]||"#16a34a"} strokeWidth={2.5} dot={false}
-                          activeDot={{r:5,strokeWidth:0,fill:ITEM_COLORS[item]||"#16a34a"}} connectNulls/>
+                          stroke={getItemColor(item)} strokeWidth={2.5} dot={false}
+                          activeDot={{r:5,strokeWidth:0,fill:getItemColor(item)}} connectNulls/>
                       ))
                   }
                   {showAvg && selectedItems.map(item => (
@@ -928,7 +1018,7 @@ function MarketDashboard() {
               lp.marketPrices.map((mp) => (
                 <div key={`${lp.item}_${mp.market}`} className="stat-card">
                   <div className="stat-item-name">
-                    <span className="color-dot" style={{background:ITEM_COLORS[lp.item]||"#16a34a"}}></span>
+                    <span className="color-dot" style={{background:getItemColor(lp.item)}}></span>
                     {lp.item}
                     {selectedMarkets.length>1 &&
                       <span style={{fontSize:10,color:MARKET_COLORS[mp.market]||"#16a34a",marginLeft:2,fontWeight:700}}>{mp.market}</span>
@@ -1006,7 +1096,7 @@ function MarketDashboard() {
                       return (
                         <tr key={`${market}_${item}`} className={isAvg?"avg-row":""}>
                           <td>
-                            <span className="color-dot" style={{background:isAvg?AVG_COLOR:(ITEM_COLORS[item]||"#16a34a"),marginRight:6}}></span>
+                            <span className="color-dot" style={{background:isAvg?AVG_COLOR:(getItemColor(item)),marginRight:6}}></span>
                             {item}
                             {isAvg
                               ? <span style={{fontSize:11,color:AVG_COLOR,marginLeft:6,fontWeight:700}}>全市場平均</span>
@@ -1048,11 +1138,12 @@ function MarketDashboard() {
       </div>
 
       {/* マスコット */}
-      {showMascot && (
-        <div className="mascot-bubble">
-          <div className="mascot-inner">
+      {showMascot ? (
+        <div className="mascot-wrap">
+          {/* 吹き出し（左）＋ キャラクター（右）横並び */}
+          <div className="mascot-speech">
             <button className="mascot-close" onClick={e=>{e.stopPropagation();setShowMascot(false);}}>✕</button>
-            {/* タブ切り替え */}
+            {/* タブ：アンダーライン型 */}
             <div className="mascot-tabs">
               <button className={`mascot-tab-btn${mascotTab==="guide"?" active":""}`}
                 onClick={e=>{e.stopPropagation();setMascotTab("guide");setGuideIdx(0);}}>
@@ -1063,47 +1154,57 @@ function MarketDashboard() {
                 🌱 旬情報
               </button>
             </div>
+            {/* コンテンツ */}
             {mascotTab==="guide" ? (
-              <div onClick={()=>setGuideIdx(i=>(i+1)%GUIDE_STEPS.length)}>
+              <div onClick={()=>setGuideIdx(i=>(i+1)%GUIDE_STEPS.length)} style={{cursor:"pointer"}}>
                 <div className="mascot-guide-icon">{GUIDE_STEPS[guideIdx].icon}</div>
                 <div className="mascot-guide-title">{GUIDE_STEPS[guideIdx].title}</div>
                 <div className="mascot-msg">{GUIDE_STEPS[guideIdx].msg}</div>
-                <div style={{textAlign:"center",marginTop:6}}>
-                  <img src={MASCOT_IMG} alt="ノウェル" style={{width:100,objectFit:"contain"}} />
-                </div>
-                <div style={{fontSize:11,color:"#9ca3af",textAlign:"center",marginTop:4}}>
-                  タップで次へ ({guideIdx+1}/{GUIDE_STEPS.length})
-                </div>
-                <div style={{display:"flex",justifyContent:"center",gap:4,marginTop:5}}>
-                  {GUIDE_STEPS.map((_,i)=>(
-                    <span key={i} onClick={e=>{e.stopPropagation();setGuideIdx(i);}}
-                      style={{width:6,height:6,borderRadius:"50%",background:i===guideIdx?"#2d6a4f":"#c8e0d0",display:"inline-block",cursor:"pointer"}}/>
-                  ))}
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:9}}>
+                  <div style={{display:"flex",gap:5}}>
+                    {GUIDE_STEPS.map((_,i)=>(
+                      <span key={i} onClick={e=>{e.stopPropagation();setGuideIdx(i);}}
+                        style={{width:i===guideIdx?16:6,height:6,borderRadius:3,background:i===guideIdx?"#2d6a4f":"#d1e8d9",display:"inline-block",cursor:"pointer",transition:"all .2s"}}/>
+                    ))}
+                  </div>
+                  <span style={{fontSize:10,color:"#b8d0c0",letterSpacing:".3px"}}>{guideIdx+1} / {GUIDE_STEPS.length}</span>
                 </div>
               </div>
             ) : (
-              <div onClick={()=>setMascotIdx(i=>(i+1)%Math.max(1,mascotMessages.length))}>
-                <div className="mascot-title">🌱 旬トレンド情報</div>
+              <div onClick={()=>setMascotIdx(i=>(i+1)%Math.max(1,mascotMessages.length))} style={{cursor:"pointer",minHeight:60}}>
                 {currentMascot ? (<>
-                  <div className="mascot-msg">{currentMascot.msg}</div>
-                  <div style={{textAlign:"center",marginTop:6}}>
-                    <img src={MASCOT_IMG} alt="ノウェル" style={{width:100,objectFit:"contain"}} />
+                  <div style={{fontSize:11,fontWeight:700,color:"#6b9080",letterSpacing:".8px",marginBottom:5,textTransform:"uppercase"}}>
+                    {currentMascot.inSeason ? "🌿 今が旬！" : "📅 旬カレンダー"}
                   </div>
+                  <div className="mascot-msg">{currentMascot.msg}</div>
                   {mascotMessages.length>1 && (
-                    <div style={{fontSize:11,color:"#9ca3af",textAlign:"center",marginTop:4}}>
-                      タップで次へ ({mascotIdx%mascotMessages.length+1}/{mascotMessages.length})
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
+                      <div style={{display:"flex",gap:5}}>
+                        {mascotMessages.map((_,i)=>(
+                          <span key={i} style={{width:i===mascotIdx%mascotMessages.length?16:6,height:6,borderRadius:3,background:i===mascotIdx%mascotMessages.length?"#2d6a4f":"#d1e8d9",display:"inline-block",transition:"all .2s"}}/>
+                        ))}
+                      </div>
+                      <span style={{fontSize:10,color:"#b8d0c0"}}>{mascotIdx%mascotMessages.length+1} / {mascotMessages.length}</span>
                     </div>
                   )}
                 </>) : (
-                  <div style={{textAlign:"center",padding:"10px 0"}}>
-                    <div style={{fontSize:13,color:"#6b9080",marginBottom:8}}>品目を選択すると<br/>旬情報が表示されます</div>
-                    <img src={MASCOT_IMG} alt="ノウェル" style={{width:100,objectFit:"contain"}} />
+                  <div style={{fontSize:12.5,color:"#6b9080",lineHeight:1.65,paddingTop:6}}>
+                    品目を選択すると<br/>旬情報が表示されます🌿
                   </div>
                 )}
               </div>
             )}
           </div>
+          {/* キャラクター立ち絵（右） */}
+          <img src={MASCOT_IMG} alt="ノウェル" className="mascot-char"
+            title="クリックで閉じる"
+            onClick={()=>setShowMascot(false)} />
         </div>
+      ) : (
+        /* 閉じているとき：キャラクターだけ表示（クリックで再表示） */
+        <button className="mascot-open-btn" onClick={()=>{setShowMascot(true);setGuideIdx(0);}}>
+          <img src={MASCOT_IMG} alt="ノウェル" style={{width:76,display:"block"}} />
+        </button>
       )}
 
       {/* MODALS */}
