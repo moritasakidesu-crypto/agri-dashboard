@@ -27,7 +27,7 @@
     .action-btn:hover{background:rgba(255,255,255,.25)}
     /* 目立つアクションボタン（コンテンツ内） */
     .cta-btn-row{display:flex;gap:12px;margin:16px 0 0;flex-wrap:wrap}
-    .cta-btn{display:flex;align-items:center;gap:8px;padding:12px 22px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all .22s;font-family:inherit;box-shadow:0 3px 12px rgba(0,0,0,.12)}
+    .cta-btn{display:flex;align-items:center;gap:8px;padding:12px 22px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all .22s;font-family:inherit;box-shadow:0 3px 12px rgba(0,0,0,.12);flex:1;min-width:180px}
     .cta-btn-sim{background:linear-gradient(135deg,#2d6a4f,#16a34a);color:#fff}
     .cta-btn-sim:hover{box-shadow:0 6px 20px rgba(22,163,74,.35);transform:translateY(-2px)}
     .cta-btn-forecast{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff}
@@ -560,7 +560,7 @@ const ForecastModal = ({ items, marketsData, selectedMarkets, dates, onClose }) 
                 </div>
               );
             })}
-            <p style={{fontSize:11,color:"#9ca3af",marginTop:14,textAlign:"center"}}>※ 過去データの線形トレンドに基づく参考値です。実際の相場とは異なる場合があります。</p>
+            <p style={{fontSize:11,color:"#9ca3af",marginTop:14,textAlign:"center",lineHeight:1.7}}>※ 過去データの線形トレンドに基づく参考値です。<br/>実際の相場とは異なる場合があります。</p>
           </>
         ) : (
           <p style={{color:"#6b9080",fontSize:14}}>データが不足しています。</p>
@@ -581,10 +581,16 @@ function MarketDashboard() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [showAvg, setShowAvg] = useState(false);
   const [chartRange, setChartRange] = useState("30");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [activeDateFrom, setActiveDateFrom] = useState("");
-  const [activeDateTo, setActiveDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState(() => {
+    const d = new Date(); d.setMonth(d.getMonth()-1);
+    return d.toISOString().slice(0,10);
+  });
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().slice(0,10));
+  const [activeDateFrom, setActiveDateFrom] = useState(() => {
+    const d = new Date(); d.setMonth(d.getMonth()-1);
+    return d.toISOString().slice(0,10);
+  });
+  const [activeDateTo, setActiveDateTo] = useState(() => new Date().toISOString().slice(0,10));
   const [favorites, setFavorites] = useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY_FAV)||"[]"); } catch{ return []; }
   });
@@ -817,9 +823,9 @@ function MarketDashboard() {
         <div className="header-right">
           <div className="status-area">
             <span className="status-dot"></span>
-            {loading?"取得中...":error?"エラー":"ライブ"}
+            <span>{loading?"取得中...":error?"エラー":"ライブ"}</span>
+            {lastUpdated && <span style={{fontSize:11,color:"rgba(255,255,255,.4)",marginLeft:6,borderLeft:"1px solid rgba(255,255,255,.2)",paddingLeft:6}}>{lastUpdated}</span>}
           </div>
-          {lastUpdated && <span style={{fontSize:11,color:"rgba(255,255,255,.5)"}}>{lastUpdated}</span>}
           <button className="hbtn" onClick={()=>{
             const url=encodeURIComponent(window.location.href);
             const text=encodeURIComponent("農業市場価格をチェック！ #NOUVATION #農業");
@@ -1041,7 +1047,27 @@ function MarketDashboard() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData} margin={{top:5,right:20,bottom:5,left:10}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f7f1" vertical={false}/>
-                  <XAxis dataKey="date" tick={{fill:"#6b9080",fontSize:11}} axisLine={false} tickLine={false} interval={Math.max(0, Math.floor(chartData.length/8)-1)} minTickGap={40}/>
+                  <XAxis
+                    dataKey="date"
+                    tick={({x,y,payload}) => {
+                      const isMobile = window.innerWidth < 600;
+                      return (
+                        <g transform={`translate(${x},${y})`}>
+                          <text
+                            transform={isMobile ? "rotate(-45)" : "rotate(0)"}
+                            textAnchor={isMobile ? "end" : "middle"}
+                            dx={isMobile ? -2 : 0}
+                            dy={isMobile ? 4 : 14}
+                            fill="#6b9080"
+                            fontSize={isMobile ? 9 : 10}
+                          >{payload.value}</text>
+                        </g>
+                      );
+                    }}
+                    axisLine={false} tickLine={false}
+                    interval="preserveStartEnd" minTickGap={window.innerWidth < 600 ? 60 : 45}
+                    height={window.innerWidth < 600 ? 40 : 25}
+                  />
                   <YAxis tick={{fill:"#6b9080",fontSize:11}} axisLine={false} tickLine={false} tickFormatter={v=>`¥${v.toLocaleString()}`} label={{value:`円/10kg`, angle:-90, position:"insideLeft", offset:8, style:{fontSize:10,fill:"#9ca3af"}}}/>
                   <Tooltip content={<CustomTooltip/>}/>
                   {selectedMarkets.length>1
